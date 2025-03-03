@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Your Coverages</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th><th>Publication</th><th>Edition</th><th>Headline</th><th>AVE</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for coverage in coverages %}
+        <tr>
+          <td>{{ coverage.date }}</td>
+          <td>{{ coverage.publication }}</td>
+          <td>{{ coverage.edition }}</td>
+          <td>{{ coverage.headline }}</td>
+          <td>{{ coverage.ave }}</td>
+        </tr>
+      {% empty %}
+       Sorry about that, something didn't go as planned. Please try again, and if you're still seeing this message, go ahead and restart the app.

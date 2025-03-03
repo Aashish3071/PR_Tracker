@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Coverage Report</h2>
+  <form method="get" class="mb-3">
+    <label>Start Date: <input type="date" name="start_date" class="form-control d-inline-block w-auto"></label>
+    <label>End Date: <input type="date" name="end_date" class="form-control d-inline-block w-auto"></label>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="?export=csv" class="btn btn-success">Export to CSV</a>
+  </form>
+
+  <h3>Print Coverages</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Sr. No.</th><th>Date</th><th>Publication</th><th>Edition</th><th>Headline</th>
+        <th>Page</th><th>Size (sq cm)</th><th>Rate</th><th>AVE</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cov in print_coverages %}
+        <tr>
+          <td>{{ forloop.counter }}</td><td>{{ cov.date }}</td><td>{{ cov.publication }}</td>
+          <td>{{ cov.edition }}</td><td>{{ cov.headline }}</td><td>{{ cov.page }}</td>
+          <td>{{ cov.size_sq_cm }}</td>
+          <td>{% with rate=Rate.objects.filter(edition=cov.edition, type=cov.type, position=cov.position, effective_from__lte=cov.date).order_by('-effective_from').first %}{{ rate.rate_per_sq_cm|default:'' }}{% endwith %}</td>
+          <td>{{ cov.ave }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9">No print coverages found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>Online Coverages</h3>
+  <table class="table">
+    <thead>
+      <tr><th>Sr. No.</th><th>Date</th><th>Publication</th><th>Headline</th><th>AVE</th></tr>
+    </thead>
+    <tbody>
+      {% for cov in online_coverages %}
+        <tr>
+          <td>{{ forloop.counter }}</td><td>{{ cov.date }}</td><td>{{ cov.publication }}</td>
+          <td>{{ cov.headline }}</td><td>{{ cov.ave }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No online coverages found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p>Total AVE: {{ total_ave|default:'0' }}</p>
+{% endblock %}
