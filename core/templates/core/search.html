@@ -1,0 +1,476 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="welcome-section mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="display-5 fw-bold">Search Results</h1>
+        <p class="lead text-muted">Find coverages, publications, and more</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-search me-2"></i>Search Results
+        {% if total_results > 0 %}
+        <span class="badge bg-primary ms-2">{{ total_results }}</span>
+        {% endif %}
+      </h5>
+    </div>
+    <div class="card-body">
+      <!-- Search Form -->
+      <form method="get" action="{% url 'search' %}" class="row g-3 mb-4">
+        <div class="col-md-12 mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+              <i class="fas fa-search"></i>
+            </span>
+            <input
+              type="text"
+              name="q"
+              class="form-control form-control-lg"
+              placeholder="Search for coverages, publications, clients..."
+              value="{{ query }}"
+            />
+            <button type="submit" class="btn btn-primary">
+              Search
+            </button>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="publication" class="form-label">Publication</label>
+          <div class="input-group">
+            <select id="publication" name="publication" class="form-select select2">
+              <option value="">All Publications</option>
+              {% for pub in all_publications %}
+              <option value="{{ pub.id }}" {% if selected_publication.id == pub.id %}selected{% endif %}>{{ pub.name }}</option>
+              {% endfor %}
+            </select>
+            <a href="{% url 'add_publication' %}" class="btn btn-outline-primary add-new-btn" title="Add New Publication">
+              <i class="fas fa-plus"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="edition" class="form-label">Edition</label>
+          <div class="input-group">
+            <select id="edition" name="edition" class="form-select select2">
+              <option value="">All Editions</option>
+              {% for ed in all_editions %}
+              <option value="{{ ed.id }}" {% if selected_edition.id == ed.id %}selected{% endif %}>{{ ed.name }} ({{ ed.publication.name }})</option>
+              {% endfor %}
+            </select>
+            <a href="{% url 'add_edition' %}" class="btn btn-outline-primary add-new-btn" title="Add New Edition">
+              <i class="fas fa-plus"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="type" class="form-label">Type</label>
+          <select id="type" name="type" class="form-select select2">
+            <option value="">All Types</option>
+            <option value="Print" {% if selected_type == 'Print' %}selected{% endif %}>Print</option>
+            <option value="Online" {% if selected_type == 'Online' %}selected{% endif %}>Online</option>
+          </select>
+        </div>
+        
+        <div class="col-12 text-end">
+          <a href="{% url 'search' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-redo me-1"></i> Reset Filters
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter me-1"></i> Apply Filters
+          </button>
+        </div>
+      </form>
+
+      {% if total_results > 0 %}
+      <!-- Tabs -->
+      <ul class="nav nav-tabs mb-3" id="resultsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="coverages-tab" data-bs-toggle="tab" data-bs-target="#coverages-content" type="button" role="tab" aria-controls="coverages-content" aria-selected="true">
+            Coverages
+            {% if coverages %}
+            <span class="badge bg-secondary ms-1">{{ coverages.count }}</span>
+            {% endif %}
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications-content" type="button" role="tab" aria-controls="publications-content" aria-selected="false">
+            Publications
+            {% if publications %}
+            <span class="badge bg-secondary ms-1">{{ publications.count }}</span>
+            {% endif %}
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="editions-tab" data-bs-toggle="tab" data-bs-target="#editions-content" type="button" role="tab" aria-controls="editions-content" aria-selected="false">
+            Editions
+            {% if editions %}
+            <span class="badge bg-secondary ms-1">{{ editions.count }}</span>
+            {% endif %}
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other-content" type="button" role="tab" aria-controls="other-content" aria-selected="false">
+            Other
+            {% if clients or campaigns or formulas %}
+            <span class="badge bg-secondary ms-1">{{ clients.count|add:campaigns.count|add:formulas.count }}</span>
+            {% endif %}
+          </button>
+        </li>
+      </ul>
+      
+      <!-- Tab Content -->
+      <div class="tab-content" id="resultsTabsContent">
+        <!-- Coverages Tab -->
+        <div class="tab-pane fade show active" id="coverages-content" role="tabpanel" aria-labelledby="coverages-tab">
+          {% if coverages %}
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Coverage Results</h5>
+              <div>
+                <a href="{% url 'add_coverage' %}" class="btn btn-sm btn-primary">
+                  <i class="fas fa-plus me-1"></i>Add New
+                </a>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Publication</th>
+                      <th>Edition</th>
+                      <th>Headline</th>
+                      <th>Type</th>
+                      <th>AVE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for coverage in coverages %}
+                    <tr>
+                      <td>{{ coverage.date|date:"d M Y" }}</td>
+                      <td>{{ coverage.publication.name }}</td>
+                      <td>{{ coverage.edition.name }}</td>
+                      <td class="text-truncate" style="max-width: 200px;">{{ coverage.headline }}</td>
+                      <td>
+                        <span class="badge {% if coverage.type == 'Print' %}bg-primary{% else %}bg-success{% endif %}">
+                          {{ coverage.type }}
+                        </span>
+                      </td>
+                      <td>₹{{ coverage.ave|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No coverages found matching your criteria.
+            
+            <div class="mt-3">
+              <a href="{% url 'add_coverage' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Coverage
+              </a>
+              <a href="{% url 'upload_excel' %}" class="btn btn-outline-primary ms-2">
+                <i class="fas fa-file-excel me-1"></i> Upload Excel
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Publications Tab -->
+        <div class="tab-pane fade" id="publications-content" role="tabpanel" aria-labelledby="publications-tab">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Publications</h5>
+            <a href="{% url 'add_publication' %}" class="btn btn-sm btn-primary add-new-btn">
+              <i class="fas fa-plus-circle me-1"></i> Add New Publication
+            </a>
+          </div>
+          
+          {% if publications %}
+          <div class="row">
+            {% for publication in publications %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ publication.name }}</h5>
+                  <p class="card-text text-muted">
+                    <small>Publication</small>
+                  </p>
+                  <form method="get" action="{% url 'search' %}">
+                    <input type="hidden" name="publication" value="{{ publication.id }}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-filter me-1"></i>Filter by this publication
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No publications found matching your criteria.
+            
+            <div class="mt-3">
+              <a href="{% url 'add_publication' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Publication{% if search_query %}: "{{ search_query }}"{% endif %}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Editions Tab -->
+        <div class="tab-pane fade" id="editions-content" role="tabpanel" aria-labelledby="editions-tab">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Editions</h5>
+            <a href="{% url 'add_edition' %}" class="btn btn-sm btn-primary add-new-btn">
+              <i class="fas fa-plus-circle me-1"></i> Add New Edition
+            </a>
+          </div>
+          
+          {% if editions %}
+          <div class="row">
+            {% for edition in editions %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ edition.name }}</h5>
+                  <p class="card-text">{{ edition.publication.name }}</p>
+                  <p class="card-text text-muted">
+                    <small>Edition</small>
+                  </p>
+                  <form method="get" action="{% url 'search' %}">
+                    <input type="hidden" name="edition" value="{{ edition.id }}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-filter me-1"></i>Filter by this edition
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No editions found matching your criteria.
+            
+            <div class="mt-3">
+              <a href="{% url 'add_edition' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Edition{% if search_query %} for "{{ search_query }}"{% endif %}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Other Results Tab -->
+        <div class="tab-pane fade" id="other-content" role="tabpanel" aria-labelledby="other-tab">
+          <!-- Clients -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Clients</h5>
+            <a href="{% url 'add_client' %}" class="btn btn-sm btn-primary add-new-btn">
+              <i class="fas fa-plus-circle me-1"></i> Add New Client
+            </a>
+          </div>
+          
+          {% if clients %}
+          <div class="row mb-4">
+            {% for client in clients %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ client.name }}</h5>
+                  <p class="card-text text-muted">
+                    <small>Client</small>
+                  </p>
+                  <a href="{% url 'add_campaign' %}?client={{ client.id }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus-circle me-1"></i>Add Campaign for this Client
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> No clients found matching your criteria.
+            
+            <div class="mt-3">
+              <a href="{% url 'add_client' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Client{% if search_query %}: "{{ search_query }}"{% endif %}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Campaigns -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Campaigns</h5>
+            <a href="{% url 'add_campaign' %}" class="btn btn-sm btn-primary add-new-btn">
+              <i class="fas fa-plus-circle me-1"></i> Add New Campaign
+            </a>
+          </div>
+          
+          {% if campaigns %}
+          <div class="row mb-4">
+            {% for campaign in campaigns %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ campaign.name }}</h5>
+                  <p class="card-text">{{ campaign.client.name }}</p>
+                  <p class="card-text text-muted">
+                    <small>Campaign</small>
+                  </p>
+                  <a href="{% url 'add_coverage' %}?client={{ campaign.client.id }}&campaign={{ campaign.id }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus-circle me-1"></i>Add Coverage for this Campaign
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% elif has_clients %}
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> No campaigns found matching your criteria.
+            
+            <div class="mt-3">
+              <a href="{% url 'add_campaign' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Campaign{% if search_query %} for "{{ search_query }}"{% endif %}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Custom Formulas -->
+          {% if formulas %}
+          <h5 class="mb-3">Custom Formulas</h5>
+          <div class="row">
+            {% for formula in formulas %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ formula.name }}</h5>
+                  <p class="card-text">{{ formula.description|truncatechars:100 }}</p>
+                  <p class="card-text text-muted">
+                    <small>Custom Formula</small>
+                  </p>
+                  <a href="{% url 'edit_custom_formula' formula.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i>Edit Formula
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          {% if not clients and not campaigns and not formulas %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No other results found matching your criteria.
+            
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <a href="{% url 'add_client' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Client
+              </a>
+              <a href="{% url 'add_publication' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Publication
+              </a>
+              <a href="{% url 'add_coverage' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add New Coverage
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4>No Results Found</h4>
+        <p class="text-muted">
+          Try adjusting your search terms or filters to find what you're looking for.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Initialize Select2 for all dropdown fields
+    $('.select2').select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: 'Select an option'
+    });
+
+    // Handle publication change to update edition options
+    $('#publication').on('change', function() {
+      const publicationId = $(this).val();
+      if (publicationId) {
+        $.ajax({
+          url: "{% url 'get_editions' %}",
+          data: {
+            publication_id: publicationId
+          },
+          dataType: 'json',
+          success: function(data) {
+            let options = '<option value="">All Editions</option>';
+            data.editions.forEach(function(edition) {
+              options += `<option value="${edition.id}">${edition.name}</option>`;
+            });
+            $('#edition').html(options).trigger('change');
+          },
+          error: function(xhr, status, error) {
+            console.error("Error fetching editions:", error);
+            $('#edition').html('<option value="">Error loading editions</option>');
+          }
+        });
+      } else {
+        $('#edition').html('<option value="">All Editions</option>').trigger('change');
+      }
+    });
+
+    // Add "Add New" buttons functionality
+    $('.add-new-btn').on('click', function(e) {
+      e.preventDefault();
+      const url = $(this).attr('href');
+      const searchQuery = "{{ search_query }}";
+      
+      // Redirect to the add page with the search query as a parameter
+      window.location.href = url + (searchQuery ? '?q=' + encodeURIComponent(searchQuery) : '');
+    });
+  });
+</script>
+{% endblock %}

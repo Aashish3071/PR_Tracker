@@ -1,0 +1,169 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="welcome-section mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="display-5 fw-bold">Report Templates</h1>
+        <p class="lead text-muted">
+          Manage your report templates for automated report generation
+        </p>
+      </div>
+      <div class="col-md-4 text-end">
+        <a href="{% url 'upload_report_template' %}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Upload New Template
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates List -->
+  <div class="card border-0 shadow-sm">
+    <div
+      class="card-header bg-white d-flex justify-content-between align-items-center"
+    >
+      <h5 class="mb-0">
+        <i class="fas fa-file-excel me-2"></i>Your Report Templates
+      </h5>
+      <div>
+        <a href="{% url 'upload_report_template' %}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Upload New Template
+        </a>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      {% if templates %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Created</th>
+              <th>Last Updated</th>
+              <th>Field Mappings</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for template in templates %}
+            <tr>
+              <td>{{ template.name }}</td>
+              <td>{{ template.description|default:"-" }}</td>
+              <td>{{ template.created_at|date:"d M Y" }}</td>
+              <td>{{ template.updated_at|date:"d M Y" }}</td>
+              <td>
+                {% if template.field_mappings %}
+                <span class="badge bg-success"
+                  >{{ template.field_mappings|length }} fields mapped</span
+                >
+                {% else %}
+                <span class="badge bg-warning">No mappings</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a
+                    href="{% url 'edit_report_template' template.id %}"
+                    class="btn btn-sm btn-outline-primary"
+                  >
+                    <i class="fas fa-edit me-1"></i> Edit
+                  </a>
+                  <a
+                    href="{% url 'generate_report' template.id %}"
+                    class="btn btn-sm btn-success"
+                  >
+                    <i class="fas fa-file-export me-1"></i> Generate
+                  </a>
+                  <a
+                    href="{% url 'delete_report_template' template.id %}"
+                    class="btn btn-sm btn-outline-danger"
+                  >
+                    <i class="fas fa-trash me-1"></i> Delete
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-5 text-center">
+        <i class="fas fa-file-excel fa-3x text-muted mb-3"></i>
+        <h4>No report templates yet</h4>
+        <p class="text-muted">
+          Upload your first report template to start generating automated
+          reports.
+        </p>
+        <a
+          href="{% url 'upload_report_template' %}"
+          class="btn btn-primary mt-3"
+        >
+          <i class="fas fa-plus me-2"></i>Upload Template
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- How It Works Section -->
+  <div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">
+        <i class="fas fa-question-circle me-2"></i>How It Works
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+          <div class="icon-box bg-primary-subtle mx-auto mb-3">
+            <i class="fas fa-upload text-primary"></i>
+          </div>
+          <h5>1. Upload Template</h5>
+          <p class="text-muted small">
+            Upload your Excel report template with column headers
+          </p>
+        </div>
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+          <div class="icon-box bg-success-subtle mx-auto mb-3">
+            <i class="fas fa-exchange-alt text-success"></i>
+          </div>
+          <h5>2. Map Fields</h5>
+          <p class="text-muted small">
+            Map template columns to database fields
+          </p>
+        </div>
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+          <div class="icon-box bg-info-subtle mx-auto mb-3">
+            <i class="fas fa-filter text-info"></i>
+          </div>
+          <h5>3. Set Filters</h5>
+          <p class="text-muted small">
+            Choose which data to include in your report
+          </p>
+        </div>
+        <div class="col-md-3 text-center">
+          <div class="icon-box bg-warning-subtle mx-auto mb-3">
+            <i class="fas fa-file-download text-warning"></i>
+          </div>
+          <h5>4. Generate & Download</h5>
+          <p class="text-muted small">Get your completed report ready to use</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+  }
+</style>
+{% endblock %}

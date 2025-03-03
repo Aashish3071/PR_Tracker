@@ -1,0 +1,59 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="welcome-section mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="display-5 fw-bold">Add New Client</h1>
+        <p class="lead text-muted">Create a new client for tracking coverage</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <a href="{% url 'search' %}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left me-2"></i>Back to Search
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="row">
+    <div class="col-lg-6 mx-auto">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-building me-2"></i>Client Details
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% url 'add_client' %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Client Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+              />
+              <div class="form-text">
+                Enter the name of the client (e.g., "Sony India", "Tata Motors")
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Create Client
+              </button>
+              <a href="{% url 'search' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

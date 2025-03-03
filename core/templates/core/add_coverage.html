@@ -1,9 +1,261 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h2>Add Coverage</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Save</button>
-  </form>
+{% extends 'base.html' %} {% block extra_css %}
+<link
+  href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+  rel="stylesheet"
+/>
+<link
+  href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+  rel="stylesheet"
+/>
+{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h4 class="mb-0">Add New Coverage</h4>
+      </div>
+      <div class="card-body">
+        <form method="post" class="mt-2" id="coverage-form">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.client.id_for_label }}" class="form-label"
+                >Client</label
+              >
+              {{ form.client.errors }} {{ form.client }}
+              <div class="mt-1">
+                <a href="{% url 'add_client' %}" class="text-primary small">
+                  <i class="fas fa-plus-circle"></i> Add New Client
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.campaign.id_for_label }}" class="form-label"
+                >Campaign</label
+              >
+              {{ form.campaign.errors }} {{ form.campaign }}
+              <div class="mt-1">
+                <a href="{% url 'add_campaign' %}" class="text-primary small">
+                  <i class="fas fa-plus-circle"></i> Add New Campaign
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.date.id_for_label }}" class="form-label"
+                >Date</label
+              >
+              {{ form.date.errors }} {{ form.date }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label
+                for="{{ form.publication.id_for_label }}"
+                class="form-label"
+                >Publication</label
+              >
+              {{ form.publication.errors }} {{ form.publication }}
+              <div class="mt-1">
+                <a
+                  href="{% url 'add_publication' %}"
+                  class="text-primary small"
+                >
+                  <i class="fas fa-plus-circle"></i> Add New Publication
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.edition.id_for_label }}" class="form-label"
+                >Edition</label
+              >
+              {{ form.edition.errors }} {{ form.edition }}
+              <div class="mt-1">
+                <a href="{% url 'add_edition' %}" class="text-primary small">
+                  <i class="fas fa-plus-circle"></i> Add New Edition
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.headline.id_for_label }}" class="form-label"
+                >Headline</label
+              >
+              {{ form.headline.errors }} {{ form.headline }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="{{ form.page.id_for_label }}" class="form-label"
+                >Page</label
+              >
+              {{ form.page.errors }} {{ form.page }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="{{ form.size.id_for_label }}" class="form-label"
+                >Size (sq cms)</label
+              >
+              {{ form.size.errors }} {{ form.size }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label
+                for="{{ form.rate_per_sq_cm.id_for_label }}"
+                class="form-label"
+                >Rate per sq cm</label
+              >
+              {{ form.rate_per_sq_cm.errors }} {{ form.rate_per_sq_cm }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="{{ form.type.id_for_label }}" class="form-label"
+                >Type</label
+              >
+              {{ form.type.errors }} {{ form.type }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="{{ form.position.id_for_label }}" class="form-label"
+                >Position</label
+              >
+              {{ form.position.errors }} {{ form.position }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="{{ form.ave.id_for_label }}" class="form-label"
+                >AVE</label
+              >
+              {{ form.ave.errors }} {{ form.ave }}
+              <div class="form-text">
+                Will be calculated automatically for print coverage
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 form-check">
+            {{ form.is_online }}
+            <label
+              for="{{ form.is_online.id_for_label }}"
+              class="form-check-label"
+              >Is Online</label
+            >
+            {{ form.is_online.errors }}
+          </div>
+
+          <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Save Coverage</button>
+            <a href="{% url 'coverage_list' %}" class="btn btn-secondary"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // Initialize Select2 for searchable dropdowns
+    $(".select2").select2({
+      theme: "bootstrap-5",
+      width: "100%",
+    });
+
+    // Handle client change to update campaign options
+    $("#id_client").on("change", function () {
+      const clientId = $(this).val();
+      if (clientId) {
+        $.ajax({
+          url: "{% url 'get_campaigns' %}",
+          data: {
+            client_id: clientId,
+          },
+          dataType: "json",
+          success: function (data) {
+            let options = '<option value="">---------</option>';
+            data.campaigns.forEach(function (campaign) {
+              options += `<option value="${campaign.id}">${campaign.name}</option>`;
+            });
+            $("#id_campaign").html(options).trigger("change");
+          },
+          error: function (xhr, status, error) {
+            console.error("Error fetching campaigns:", error);
+            $("#id_campaign").html(
+              '<option value="">Error loading campaigns</option>'
+            );
+          },
+        });
+      } else {
+        $("#id_campaign")
+          .html('<option value="">---------</option>')
+          .trigger("change");
+      }
+    });
+
+    // Handle publication change to update edition options
+    $("#id_publication").on("change", function () {
+      const publicationId = $(this).val();
+      if (publicationId) {
+        $.ajax({
+          url: "{% url 'get_editions' %}",
+          data: {
+            publication_id: publicationId,
+          },
+          dataType: "json",
+          success: function (data) {
+            let options = '<option value="">---------</option>';
+            data.editions.forEach(function (edition) {
+              options += `<option value="${edition.id}">${edition.name}</option>`;
+            });
+            $("#id_edition").html(options).trigger("change");
+          },
+          error: function (xhr, status, error) {
+            console.error("Error fetching editions:", error);
+            $("#id_edition").html(
+              '<option value="">Error loading editions</option>'
+            );
+          },
+        });
+      } else {
+        $("#id_edition")
+          .html('<option value="">---------</option>')
+          .trigger("change");
+      }
+    });
+
+    // Auto-calculate AVE when size or rate changes
+    $("#id_size, #id_rate_per_sq_cm").on("input", function () {
+      const size = parseFloat($("#id_size").val()) || 0;
+      const rate = parseFloat($("#id_rate_per_sq_cm").val()) || 0;
+      const isOnline = $("#id_is_online").is(":checked");
+      const type = $("#id_type").val();
+
+      if (!isOnline && type !== "Online" && size > 0 && rate > 0) {
+        const ave = size * rate;
+        $("#id_ave").val(ave.toFixed(2));
+      }
+    });
+
+    // Handle type change
+    $("#id_type").on("change", function () {
+      if ($(this).val() === "Online") {
+        $("#id_is_online").prop("checked", true);
+      }
+    });
+
+    // Handle is_online change
+    $("#id_is_online").on("change", function () {
+      if ($(this).is(":checked")) {
+        $("#id_ave").attr("required", "required");
+      } else {
+        $("#id_ave").removeAttr("required");
+      }
+    });
+  });
+</script>
 {% endblock %}

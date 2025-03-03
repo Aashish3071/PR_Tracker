@@ -1,52 +1,127 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h2>Coverage Report</h2>
-  <form method="get" class="mb-3">
-    <label>Start Date: <input type="date" name="start_date" class="form-control d-inline-block w-auto"></label>
-    <label>End Date: <input type="date" name="end_date" class="form-control d-inline-block w-auto"></label>
-    <button type="submit" class="btn btn-primary">Filter</button>
-    <a href="?export=csv" class="btn btn-success">Export to CSV</a>
-  </form>
+{% extends 'base.html' %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <h2>Coverage Report</h2>
 
-  <h3>Print Coverages</h3>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Sr. No.</th><th>Date</th><th>Publication</th><th>Edition</th><th>Headline</th>
-        <th>Page</th><th>Size (sq cm)</th><th>Rate</th><th>AVE</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for cov in print_coverages %}
-        <tr>
-          <td>{{ forloop.counter }}</td><td>{{ cov.date }}</td><td>{{ cov.publication }}</td>
-          <td>{{ cov.edition }}</td><td>{{ cov.headline }}</td><td>{{ cov.page }}</td>
-          <td>{{ cov.size_sq_cm }}</td>
-          <td>{% with rate=Rate.objects.filter(edition=cov.edition, type=cov.type, position=cov.position, effective_from__lte=cov.date).order_by('-effective_from').first %}{{ rate.rate_per_sq_cm|default:'' }}{% endwith %}</td>
-          <td>{{ cov.ave }}</td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="9">No print coverages found.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <div class="card mb-4">
+      <div class="card-body">
+        <form method="get" class="row g-3">
+          <div class="col-md-4">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="start_date"
+              name="start_date"
+              value="{{ request.GET.start_date }}"
+            />
+          </div>
+          <div class="col-md-4">
+            <label for="end_date" class="form-label">End Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="end_date"
+              name="end_date"
+              value="{{ request.GET.end_date }}"
+            />
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">Filter</button>
+            <a href="?export=csv" class="btn btn-success">Export CSV</a>
+          </div>
+        </form>
+      </div>
+    </div>
 
-  <h3>Online Coverages</h3>
-  <table class="table">
-    <thead>
-      <tr><th>Sr. No.</th><th>Date</th><th>Publication</th><th>Headline</th><th>AVE</th></tr>
-    </thead>
-    <tbody>
-      {% for cov in online_coverages %}
-        <tr>
-          <td>{{ forloop.counter }}</td><td>{{ cov.date }}</td><td>{{ cov.publication }}</td>
-          <td>{{ cov.headline }}</td><td>{{ cov.ave }}</td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="5">No online coverages found.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Print Coverages</h5>
+          </div>
+          <div class="card-body">
+            {% if print_coverages %}
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Publication</th>
+                  <th>Edition</th>
+                  <th>Headline</th>
+                  <th>Page</th>
+                  <th>Size</th>
+                  <th>Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for coverage in print_coverages %}
+                <tr>
+                  <td>{{ coverage.date|date:"d M Y" }}</td>
+                  <td>{{ coverage.publication.name }}</td>
+                  <td>{{ coverage.edition.name }}</td>
+                  <td>{{ coverage.headline }}</td>
+                  <td>{{ coverage.page }}</td>
+                  <td>{{ coverage.size_sq_cm }}</td>
+                  <td>{{ coverage.rate }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">
+              No print coverages found for the selected period.
+            </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
 
-  <p>Total AVE: {{ total_ave|default:'0' }}</p>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Online Coverages</h5>
+          </div>
+          <div class="card-body">
+            {% if online_coverages %}
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Publication</th>
+                  <th>Headline</th>
+                  <th>AVE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for coverage in online_coverages %}
+                <tr>
+                  <td>{{ coverage.date|date:"d M Y" }}</td>
+                  <td>{{ coverage.publication.name }}</td>
+                  <td>{{ coverage.headline }}</td>
+                  <td>{{ coverage.ave }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">
+              No online coverages found for the selected period.
+            </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Summary</h5>
+        <p class="card-text">
+          Total AVE: <strong>₹{{ total_ave|floatformat:2 }}</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

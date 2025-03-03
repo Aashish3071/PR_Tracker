@@ -1,0 +1,110 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container py-4">
+  <!-- Action Buttons -->
+  <div class="mb-4">
+    <a href="{% url 'add_custom_formula' %}" class="btn btn-primary">
+      <i class="fas fa-plus-circle me-1"></i> Add New Formula
+    </a>
+    <a href="{% url 'coverage_list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-1"></i> Back to Coverages
+    </a>
+  </div>
+
+  <!-- Formulas List -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="mb-0">Your Custom Formulas</h3>
+    </div>
+    <div class="card-body">
+      {% if formulas %}
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Formula</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for formula in formulas %}
+            <tr>
+              <td>{{ formula.name }}</td>
+              <td><code>{{ formula.formula }}</code></td>
+              <td>{{ formula.description }}</td>
+              <td>
+                <div class="btn-group">
+                  <a
+                    href="{% url 'test_custom_formula' formula.id %}"
+                    class="btn btn-sm btn-info"
+                  >
+                    <i class="fas fa-flask me-1"></i> Test
+                  </a>
+                  <a
+                    href="{% url 'edit_custom_formula' formula.id %}"
+                    class="btn btn-sm btn-primary"
+                  >
+                    <i class="fas fa-edit me-1"></i> Edit
+                  </a>
+                  <a
+                    href="{% url 'delete_custom_formula' formula.id %}"
+                    class="btn btn-sm btn-danger"
+                  >
+                    <i class="fas fa-trash me-1"></i> Delete
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> You haven't created any custom
+        formulas yet.
+        <a href="{% url 'add_custom_formula' %}" class="alert-link"
+          >Create your first formula</a
+        >
+        to start building custom metrics.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Help Section -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h3 class="mb-0">About Custom Formulas</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        Custom formulas allow you to create your own metrics and calculations
+        based on your coverage data.
+      </p>
+      <p>You can use variables like:</p>
+      <ul>
+        <li><code>ave</code> - Advertising Value Equivalent</li>
+        <li><code>size</code> - Size in square centimeters</li>
+        <li><code>rate</code> - Rate per square centimeter</li>
+        <li><code>count</code> - Number of coverages</li>
+      </ul>
+      <p>
+        And mathematical functions like <code>sum</code>, <code>min</code>,
+        <code>max</code>, <code>avg</code>, <code>round</code>, etc.
+      </p>
+      <p>Example formulas:</p>
+      <ul>
+        <li><code>ave * 1.5</code> - Calculate 150% of AVE</li>
+        <li>
+          <code>size * rate * 2</code> - Double the standard AVE calculation
+        </li>
+        <li>
+          <code>round(ave / count)</code> - Average AVE per coverage, rounded
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

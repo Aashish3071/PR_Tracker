@@ -1,0 +1,236 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Report Status -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div
+          class="card-header bg-white d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">
+            <i class="fas fa-file-excel me-2"></i>Report: "{{
+            report.template.name }}"
+          </h5>
+          <div>
+            <a
+              href="{% url 'report_template_list' %}"
+              class="btn btn-outline-primary"
+            >
+              <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+          </div>
+        </div>
+        <div class="card-body text-center p-5">
+          {% if report.status == 'completed' %}
+          <div class="mb-4">
+            <div class="icon-box bg-success-subtle mx-auto mb-3">
+              <i class="fas fa-check-circle text-success"></i>
+            </div>
+            <h3>Report Ready!</h3>
+            <p class="text-muted">
+              Your report has been successfully generated and is ready to
+              download.
+            </p>
+          </div>
+
+          <a
+            href="{% url 'download_generated_report' report.id %}"
+            class="btn btn-primary btn-lg"
+          >
+            <i class="fas fa-download me-2"></i>Download Report
+          </a>
+          {% elif report.status == 'processing' %}
+          <div class="mb-4">
+            <div class="icon-box bg-info-subtle mx-auto mb-3">
+              <i class="fas fa-spinner fa-spin text-info"></i>
+            </div>
+            <h3>Processing...</h3>
+            <p class="text-muted">
+              Your report is currently being generated. This may take a few
+              moments.
+            </p>
+          </div>
+
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <p class="mt-4">
+            <small>This page will refresh automatically in 5 seconds...</small>
+          </p>
+          {% elif report.status == 'failed' %}
+          <div class="mb-4">
+            <div class="icon-box bg-danger-subtle mx-auto mb-3">
+              <i class="fas fa-exclamation-circle text-danger"></i>
+            </div>
+            <h3>Generation Failed</h3>
+            <p class="text-muted">There was an error generating your report.</p>
+          </div>
+
+          {% if report.error_message %}
+          <div class="alert alert-danger">
+            <strong>Error:</strong> {{ report.error_message }}
+          </div>
+          {% endif %}
+
+          <div class="d-grid gap-2 col-md-6 mx-auto">
+            <a
+              href="{% url 'generate_report' report.template.id %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-redo me-2"></i>Try Again
+            </a>
+            <a
+              href="{% url 'report_template_list' %}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+          </div>
+          {% else %}
+          <div class="mb-4">
+            <div class="icon-box bg-warning-subtle mx-auto mb-3">
+              <i class="fas fa-question-circle text-warning"></i>
+            </div>
+            <h3>Unknown Status</h3>
+            <p class="text-muted">The status of your report is unknown.</p>
+          </div>
+
+          <div class="d-grid gap-2 col-md-6 mx-auto">
+            <a
+              href="{% url 'generate_report' report.template.id %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-redo me-2"></i>Try Again
+            </a>
+            <a
+              href="{% url 'report_template_list' %}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Report Details -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Report Details
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label text-muted">Template</label>
+                <p class="mb-0 fw-bold">{{ report.template.name }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label text-muted">Generated On</label>
+                <p class="mb-0">{{ report.created_at|date:"d M Y, h:i A" }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label text-muted">Status</label>
+                <p class="mb-0">
+                  {% if report.status == 'completed' %}
+                  <span class="badge bg-success">Completed</span>
+                  {% elif report.status == 'processing' %}
+                  <span class="badge bg-info">Processing</span>
+                  {% elif report.status == 'failed' %}
+                  <span class="badge bg-danger">Failed</span>
+                  {% else %}
+                  <span class="badge bg-secondary"
+                    >{{ report.status|title }}</span
+                  >
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label text-muted">Applied Filters</label>
+                <ul class="list-group list-group-flush">
+                  {% if report.filter_criteria.start_date %}
+                  <li class="list-group-item px-0">
+                    <strong>Start Date:</strong> {{
+                    report.filter_criteria.start_date|date:"d M Y" }}
+                  </li>
+                  {% endif %} {% if report.filter_criteria.end_date %}
+                  <li class="list-group-item px-0">
+                    <strong>End Date:</strong> {{
+                    report.filter_criteria.end_date|date:"d M Y" }}
+                  </li>
+                  {% endif %} {% if report.filter_criteria.publication_id %}
+                  <li class="list-group-item px-0">
+                    <strong>Publication:</strong> {{
+                    report.filter_criteria.publication_name }}
+                  </li>
+                  {% endif %} {% if report.filter_criteria.edition_id %}
+                  <li class="list-group-item px-0">
+                    <strong>Edition:</strong> {{
+                    report.filter_criteria.edition_name }}
+                  </li>
+                  {% endif %} {% if report.filter_criteria.client_id %}
+                  <li class="list-group-item px-0">
+                    <strong>Client:</strong> {{
+                    report.filter_criteria.client_name }}
+                  </li>
+                  {% endif %} {% if report.filter_criteria.campaign_id %}
+                  <li class="list-group-item px-0">
+                    <strong>Campaign:</strong> {{
+                    report.filter_criteria.campaign_name }}
+                  </li>
+                  {% endif %} {% if report.filter_criteria.coverage_type %}
+                  <li class="list-group-item px-0">
+                    <strong>Coverage Type:</strong> {{
+                    report.filter_criteria.coverage_type }}
+                  </li>
+                  {% endif %} {% if not report.filter_criteria.start_date and
+                  not report.filter_criteria.end_date and not
+                  report.filter_criteria.publication_id and not
+                  report.filter_criteria.edition_id and not
+                  report.filter_criteria.client_id and not
+                  report.filter_criteria.campaign_id and not
+                  report.filter_criteria.coverage_type %}
+                  <li class="list-group-item px-0 text-muted">
+                    No filters applied (all data included)
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .icon-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+</style>
+
+{% if report.status == 'processing' %} {% block extra_js %}
+<script>
+  // Auto-refresh the page if report is still processing
+  setTimeout(function () {
+    window.location.reload();
+  }, 5000);
+</script>
+{% endblock %} {% endif %} {% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container-fluid py-4">
+  <!-- Summary Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card stats-card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Total AVE Value</h5>
+          <h2 class="display-6 fw-bold">₹{{ total_ave|floatformat:2 }}</h2>
+          <p class="text-muted">Combined value of all coverage</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card stats-card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Print AVE</h5>
+          <h2 class="display-6 fw-bold">₹{{ print_ave|floatformat:2 }}</h2>
+          <p class="text-muted">{{ print_count }} print coverages</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card stats-card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Online AVE</h5>
+          <h2 class="display-6 fw-bold">₹{{ online_ave|floatformat:2 }}</h2>
+          <p class="text-muted">{{ online_count }} online coverages</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Coverage Section -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">PRINT COVERAGE</h3>
+      <div>
+        <a href="{% url 'export_ave_report' %}" class="btn btn-sm btn-primary">
+          <i class="fas fa-file-excel me-1"></i> Export to Excel
+        </a>
+        <a
+          href="{% url 'coverage_list' %}"
+          class="btn btn-sm btn-outline-secondary"
+        >
+          <i class="fas fa-arrow-left me-1"></i> Back to Coverages
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Sr. No.</th>
+              <th>Date</th>
+              <th>Publication</th>
+              <th>Edition</th>
+              <th>Headline</th>
+              <th>Page</th>
+              <th>Size (sq cms)</th>
+              <th>Rate</th>
+              <th>AVE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for coverage in print_coverages %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ coverage.date|date:"d-M-y" }}</td>
+              <td>{{ coverage.publication.name }}</td>
+              <td>{{ coverage.edition.name }}</td>
+              <td>{{ coverage.headline }}</td>
+              <td>{{ coverage.page }}</td>
+              <td>{{ coverage.size }}</td>
+              <td>{{ coverage.rate_per_sq_cm }}</td>
+              <td>{{ coverage.ave|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="text-center">
+                No print coverage data available
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="table-dark">
+              <td colspan="6" class="text-end fw-bold">Total</td>
+              <td>{{ print_total_size }}</td>
+              <td></td>
+              <td>{{ print_ave|floatformat:2 }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Online Coverage Section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="mb-0">ONLINE COVERAGE</h3>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Sr. No.</th>
+              <th>Date</th>
+              <th>Publication</th>
+              <th>Edition</th>
+              <th>Headline</th>
+              <th>AVE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for coverage in online_coverages %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ coverage.date|date:"d-M-y" }}</td>
+              <td>{{ coverage.publication.name }}</td>
+              <td>{{ coverage.edition.name }}</td>
+              <td>{{ coverage.headline }}</td>
+              <td>{{ coverage.ave|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center">
+                No online coverage data available
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="table-dark">
+              <td colspan="5" class="text-end fw-bold">Total</td>
+              <td>{{ online_ave|floatformat:2 }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign Summary -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="mb-0">Campaign Summary</h3>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5 class="mb-0">Coverage Distribution</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Count</th>
+                      <th>Percentage</th>
+                      <th>AVE Value</th>
+                      <th>AVE %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Print</td>
+                      <td>{{ print_count }}</td>
+                      <td>{{ print_percentage|floatformat:1 }}%</td>
+                      <td>₹{{ print_ave|floatformat:2 }}</td>
+                      <td>{{ print_ave_percentage|floatformat:1 }}%</td>
+                    </tr>
+                    <tr>
+                      <td>Online</td>
+                      <td>{{ online_count }}</td>
+                      <td>{{ online_percentage|floatformat:1 }}%</td>
+                      <td>₹{{ online_ave|floatformat:2 }}</td>
+                      <td>{{ online_ave_percentage|floatformat:1 }}%</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="table-dark">
+                      <td>Total</td>
+                      <td>{{ total_count }}</td>
+                      <td>100%</td>
+                      <td>₹{{ total_ave|floatformat:2 }}</td>
+                      <td>100%</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Top Publications by AVE</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Publication</th>
+                      <th>Coverage Count</th>
+                      <th>Total AVE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for pub in top_publications %}
+                    <tr>
+                      <td>{{ pub.publication__name }}</td>
+                      <td>{{ pub.count }}</td>
+                      <td>₹{{ pub.total_ave|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="3" class="text-center">No data available</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

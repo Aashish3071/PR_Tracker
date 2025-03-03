@@ -1,20 +1,185 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>AVE Calculator</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-  <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-      <a class="navbar-brand" href="{% url 'coverage_list' %}">AVE Calculator</a>
-      <div class="navbar-nav">
-        <a class="nav-link" href="{% url 'add_coverage' %}">Add Coverage</a>
-        <a class="nav-link" href="{% url 'upload_coverage' %}">Upload Coverage</a>
-        <a class="nav-link" href="{% url 'coverage_report' %}">Report</a>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PR Coverage Tracker</title>
+    <!-- Favicon -->
+    {% load static %}
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'core/img/favicon.png' %}"
+    />
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Modern Theme CSS -->
+    <link href="{% static 'core/css/modern-theme.css' %}" rel="stylesheet" />
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">
+          <i class="fas fa-chart-line me-2"></i>PR Tracker
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == '/' %}active{% endif %}"
+                href="{% url 'home' %}"
+              >
+                <i class="fas fa-home me-1"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/coverages/' in request.path %}active{% endif %}"
+                href="{% url 'coverage_list' %}"
+              >
+                <i class="fas fa-newspaper me-1"></i> Coverages
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/ave-report/' in request.path %}active{% endif %}"
+                href="{% url 'ave_report' %}"
+              >
+                <i class="fas fa-chart-bar me-1"></i> AVE Report
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/custom-formulas/' in request.path %}active{% endif %}"
+                href="{% url 'custom_formula_list' %}"
+              >
+                <i class="fas fa-calculator me-1"></i> Custom Formulas
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/report-templates/' in request.path %}active{% endif %}"
+                href="{% url 'report_template_list' %}"
+              >
+                <i class="fas fa-file-export me-1"></i> Report Templates
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-plus-circle me-1"></i> Add New
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item" href="{% url 'add_coverage' %}">
+                    <i class="fas fa-newspaper me-2"></i> Add Coverage
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'upload_excel' %}">
+                    <i class="fas fa-file-excel me-2"></i> Upload Excel
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'add_custom_formula' %}"
+                  >
+                    <i class="fas fa-calculator me-2"></i> Add Custom Formula
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'upload_report_template' %}"
+                  >
+                    <i class="fas fa-file-export me-2"></i> Upload Report
+                    Template
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <form method="get" action="{% url 'search' %}" class="d-flex me-2">
+            <div class="input-group">
+              <input
+                type="text"
+                name="q"
+                class="form-control"
+                placeholder="Search publications, clients, coverages..."
+                aria-label="Search"
+              />
+              <button class="btn btn-light" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
+
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/logout/">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
-    {% block content %}{% endblock %}
-  </div>
-</body>
+
+    <!-- Main Content -->
+    <main class="container-fluid py-4">{% block content %}{% endblock %}</main>
+
+    <!-- Footer -->
+    <footer class="text-center text-muted">
+      <div class="container">
+        <p class="mb-0">
+          &copy; {% now "Y" %} PR Tracker. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Modern Theme JS -->
+    <script src="{% static 'core/js/modern-theme.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
 </html>

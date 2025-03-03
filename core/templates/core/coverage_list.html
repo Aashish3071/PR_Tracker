@@ -1,20 +1,112 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h2>Your Coverages</h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Date</th><th>Publication</th><th>Edition</th><th>Headline</th><th>AVE</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for coverage in coverages %}
-        <tr>
-          <td>{{ coverage.date }}</td>
-          <td>{{ coverage.publication }}</td>
-          <td>{{ coverage.edition }}</td>
-          <td>{{ coverage.headline }}</td>
-          <td>{{ coverage.ave }}</td>
-        </tr>
-      {% empty %}
-       Sorry about that, something didn't go as planned. Please try again, and if you're still seeing this message, go ahead and restart the app.
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="stats-card">
+        <i class="fas fa-newspaper"></i>
+        <h3>{{ coverages.count }}</h3>
+        <p>Total Coverages</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stats-card">
+        <i class="fas fa-print"></i>
+        <h3>{{ print_count }}</h3>
+        <p>Print Coverages</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stats-card">
+        <i class="fas fa-globe"></i>
+        <h3>{{ online_count }}</h3>
+        <p>Online Coverages</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Coverage List</h5>
+      <div class="action-buttons">
+        <a href="{% url 'add_coverage' %}" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i>Add New Coverage
+        </a>
+        <a href="{% url 'upload_excel' %}" class="btn btn-success">
+          <i class="fas fa-file-excel me-1"></i>Upload Excel
+        </a>
+        <a href="{% url 'coverage_report' %}" class="btn btn-info">
+          <i class="fas fa-chart-bar me-1"></i>View Report
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      {% if coverages %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Publication</th>
+              <th>Edition</th>
+              <th>Headline</th>
+              <th>Page</th>
+              <th>Size</th>
+              <th>Type</th>
+              <th>Position</th>
+              <th>AVE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for coverage in coverages %}
+            <tr>
+              <td>{{ coverage.date|date:"d M Y" }}</td>
+              <td>{{ coverage.publication.name }}</td>
+              <td>{{ coverage.edition.name }}</td>
+              <td>{{ coverage.headline }}</td>
+              <td>{{ coverage.page }}</td>
+              <td>{{ coverage.size_sq_cm }}</td>
+              <td>
+                <span
+                  class="badge {% if coverage.type == 'color' %}bg-primary{% else %}bg-secondary{% endif %}"
+                >
+                  {{ coverage.type }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-info"> {{ coverage.position }} </span>
+              </td>
+              <td>
+                {% if coverage.ave %}
+                <span class="badge bg-success"
+                  >₹{{ coverage.ave|floatformat:2 }}</span
+                >
+                {% else %}
+                <span class="badge bg-warning">Pending</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+        <h4>No Coverages Found</h4>
+        <p class="text-muted">
+          Start by adding a new coverage or uploading an Excel file.
+        </p>
+        <div class="mt-4">
+          <a href="{% url 'add_coverage' %}" class="btn btn-primary me-2">
+            <i class="fas fa-plus me-1"></i>Add New Coverage
+          </a>
+          <a href="{% url 'upload_excel' %}" class="btn btn-success">
+            <i class="fas fa-file-excel me-1"></i>Upload Excel
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

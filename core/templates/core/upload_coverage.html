@@ -1,14 +1,45 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h2>Upload Coverage Data</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="file" accept=".csv, .xlsx" class="form-control">
-    <button type="submit" class="btn btn-primary mt-2">Upload</button>
-  </form>
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+{% extends 'base.html' %} {% block content %}
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <h2>Upload Coverage Data</h2>
+    <div class="card mt-4">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="file" class="form-label">Excel File</label>
+            <input
+              type="file"
+              class="form-control"
+              id="file"
+              name="file"
+              accept=".xlsx,.xls"
+              required
+            />
+            <div class="form-text">
+              Please upload an Excel file with the following columns:
+              <ul>
+                <li>Date</li>
+                <li>Publication</li>
+                <li>Editions</li>
+                <li>Headline</li>
+                <li>Page</li>
+                <li>Size (sq cms)</li>
+                <li>Type (bw/color/online)</li>
+                <li>Position (inside/front/back)</li>
+                <li>AVE (for online coverage)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Upload</button>
+            <a href="{% url 'coverage_list' %}" class="btn btn-secondary"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

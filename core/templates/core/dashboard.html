@@ -1,0 +1,319 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <!-- Main Action Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 action-card">
+        <div class="card-body text-center p-4">
+          <div class="icon-box bg-primary-subtle mx-auto mb-3">
+            <i class="fas fa-plus text-primary"></i>
+          </div>
+          <h5 class="card-title">Add Coverage</h5>
+          <p class="card-text text-muted">
+            Manually add a new PR coverage entry
+          </p>
+          <a
+            href="{% url 'add_coverage' %}"
+            class="btn btn-primary mt-2 stretched-link"
+          >
+            <i class="fas fa-plus me-2"></i>Add New
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 action-card">
+        <div class="card-body text-center p-4">
+          <div class="icon-box bg-success-subtle mx-auto mb-3">
+            <i class="fas fa-file-excel text-success"></i>
+          </div>
+          <h5 class="card-title">Upload Excel</h5>
+          <p class="card-text text-muted">
+            Bulk import coverages from Excel file
+          </p>
+          <a
+            href="{% url 'upload_excel' %}"
+            class="btn btn-success mt-2 stretched-link"
+          >
+            <i class="fas fa-upload me-2"></i>Upload
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 action-card">
+        <div class="card-body text-center p-4">
+          <div class="icon-box bg-info-subtle mx-auto mb-3">
+            <i class="fas fa-file-export text-info"></i>
+          </div>
+          <h5 class="card-title">Report Templates</h5>
+          <p class="card-text text-muted">
+            Generate custom reports from templates
+          </p>
+          <a
+            href="{% url 'report_template_list' %}"
+            class="btn btn-info mt-2 stretched-link"
+          >
+            <i class="fas fa-file-export me-2"></i>Reports
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 action-card">
+        <div class="card-body text-center p-4">
+          <div class="icon-box bg-warning-subtle mx-auto mb-3">
+            <i class="fas fa-chart-bar text-warning"></i>
+          </div>
+          <h5 class="card-title">AVE Report</h5>
+          <p class="card-text text-muted">View and export AVE analytics</p>
+          <a
+            href="{% url 'ave_report' %}"
+            class="btn btn-warning mt-2 stretched-link"
+          >
+            <i class="fas fa-chart-bar me-2"></i>Analytics
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-line me-2"></i>Coverage Statistics
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="stats-card text-center mb-3 mb-md-0">
+                <div class="icon-box bg-primary-subtle mx-auto mb-2">
+                  <i class="fas fa-newspaper text-primary"></i>
+                </div>
+                <h2 class="display-6 fw-bold mb-0">{{ total_coverages }}</h2>
+                <p class="text-muted">Total Coverages</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stats-card text-center mb-3 mb-md-0">
+                <div class="icon-box bg-success-subtle mx-auto mb-2">
+                  <i class="fas fa-print text-success"></i>
+                </div>
+                <h2 class="display-6 fw-bold mb-0">{{ print_coverages }}</h2>
+                <p class="text-muted">Print ({{ print_percentage }}%)</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stats-card text-center mb-3 mb-md-0">
+                <div class="icon-box bg-info-subtle mx-auto mb-2">
+                  <i class="fas fa-globe text-info"></i>
+                </div>
+                <h2 class="display-6 fw-bold mb-0">{{ online_coverages }}</h2>
+                <p class="text-muted">Online ({{ online_percentage }}%)</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stats-card text-center">
+                <div class="icon-box bg-warning-subtle mx-auto mb-2">
+                  <i class="fas fa-rupee-sign text-warning"></i>
+                </div>
+                <h2 class="display-6 fw-bold mb-0">
+                  ₹{{ total_ave|floatformat:0 }}
+                </h2>
+                <p class="text-muted">Total AVE</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Row -->
+  <div class="row">
+    <!-- Recent Coverages -->
+    <div class="col-lg-8 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div
+          class="card-header bg-white d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">
+            <i class="fas fa-clock me-2"></i>Recent Coverages
+          </h5>
+          <a
+            href="{% url 'coverage_list' %}"
+            class="btn btn-sm btn-outline-primary"
+            >View All</a
+          >
+        </div>
+        <div class="card-body p-0">
+          {% if recent_coverages %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Publication</th>
+                  <th>Headline</th>
+                  <th>Type</th>
+                  <th>AVE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for coverage in recent_coverages %}
+                <tr>
+                  <td>{{ coverage.date|date:"d M Y" }}</td>
+                  <td>{{ coverage.publication.name }}</td>
+                  <td class="text-truncate" style="max-width: 200px">
+                    {{ coverage.headline }}
+                  </td>
+                  <td>
+                    <span
+                      class="badge {% if coverage.type == 'Print' %}bg-primary{% else %}bg-success{% endif %}"
+                    >
+                      {{ coverage.type }}
+                    </span>
+                  </td>
+                  <td>₹{{ coverage.ave|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="p-4 text-center">
+            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+            <h5>No coverages yet</h5>
+            <p class="text-muted">
+              Start tracking your PR coverage by adding your first entry.
+            </p>
+            <a href="{% url 'add_coverage' %}" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>Add Coverage
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+      <!-- Top Publications -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-building me-2"></i>Top Publications
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          {% if top_publications %}
+          <ul class="list-group list-group-flush">
+            {% for pub in top_publications %}
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <h6 class="mb-0">{{ pub.publication__name }}</h6>
+                <small class="text-muted">{{ pub.count }} coverages</small>
+              </div>
+              <span class="badge bg-primary rounded-pill"
+                >₹{{ pub.total_ave|floatformat:0 }}</span
+              >
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="p-4 text-center">
+            <p class="text-muted">No publication data available yet.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Coverage Distribution -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-pie me-2"></i>Coverage Distribution
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if total_coverages > 0 %}
+          <div class="mb-3">
+            <label class="form-label d-flex justify-content-between">
+              <span>Print ({{ print_percentage }}%)</span>
+              <span>{{ print_coverages }}/{{ total_coverages }}</span>
+            </label>
+            <div class="progress" style="height: 20px">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                style="width: {{ print_percentage }}%"
+                aria-valuenow="{{ print_percentage }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label d-flex justify-content-between">
+              <span>Online ({{ online_percentage }}%)</span>
+              <span>{{ online_coverages }}/{{ total_coverages }}</span>
+            </label>
+            <div class="progress" style="height: 20px">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: {{ online_percentage }}%"
+                aria-valuenow="{{ online_percentage }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+          {% else %}
+          <div class="text-center">
+            <p class="text-muted">No coverage data available yet.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+  }
+
+  .action-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .action-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .stats-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .stats-card:hover {
+    background-color: #f8f9fa;
+  }
+</style>
+{% endblock %}

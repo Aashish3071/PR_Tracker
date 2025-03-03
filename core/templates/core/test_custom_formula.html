@@ -1,0 +1,126 @@
+{% extends 'base.html' %} {% load core_extras %} {% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="page-header mb-4">
+    <h1 class="fw-bold">Test Custom Formula</h1>
+    <p class="text-muted">Try your formula with sample values</p>
+  </div>
+
+  <!-- Formula Details -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="mb-0">Formula: {{ formula.name }}</h3>
+    </div>
+    <div class="card-body">
+      <p><strong>Expression:</strong> <code>{{ formula.formula }}</code></p>
+      <p><strong>Description:</strong> {{ formula.description }}</p>
+    </div>
+  </div>
+
+  <!-- Test Form -->
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Test Values</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="row">
+              {% for var, description in available_variables %}
+              <div class="col-md-6 mb-3">
+                <label for="var_{{ var }}" class="form-label"
+                  >{{ description }}</label
+                >
+                <div class="input-group">
+                  <span class="input-group-text">{{ var }} =</span>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="var_{{ var }}"
+                    name="{{ var }}"
+                    value="{{ test_data|get_item:var|default:'100' }}"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+              <a
+                href="{% url 'edit_custom_formula' formula.id %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-edit me-1"></i> Edit Formula
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-calculator me-1"></i> Calculate Result
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      {% if result is not None %}
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h3 class="mb-0">Result</h3>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <h2 class="display-4">{{ result }}</h2>
+            <p class="text-muted">Calculated value</p>
+          </div>
+
+          <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle me-2"></i>
+            This is the result of applying your formula to the test values.
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Instructions</h3>
+        </div>
+        <div class="card-body">
+          <p>
+            Enter sample values for each variable and click "Calculate Result"
+            to test your formula.
+          </p>
+          <p>The default values are set to 100 for easy testing.</p>
+          <p>You can adjust the values to simulate different scenarios.</p>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card mt-3">
+        <div class="card-header">
+          <h3 class="mb-0">Actions</h3>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a
+              href="{% url 'custom_formula_list' %}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="fas fa-arrow-left me-1"></i> Back to Formula List
+            </a>
+            <a
+              href="{% url 'edit_custom_formula' formula.id %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-edit me-1"></i> Edit Formula
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

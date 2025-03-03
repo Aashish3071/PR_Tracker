@@ -1,0 +1,282 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Filter Form -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div
+          class="card-header bg-white d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Generate Report: "{{ template.name
+            }}"
+          </h5>
+          <div>
+            <a
+              href="{% url 'report_template_list' %}"
+              class="btn btn-outline-primary"
+            >
+              <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+
+            <p class="mb-4">
+              Select filters to determine which data will be included in your
+              report:
+            </p>
+
+            <div class="row g-3">
+              <!-- Date Range -->
+              <div class="col-md-6">
+                <label for="id_start_date" class="form-label">Start Date</label>
+                <input
+                  type="date"
+                  name="start_date"
+                  id="id_start_date"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label for="id_end_date" class="form-label">End Date</label>
+                <input
+                  type="date"
+                  name="end_date"
+                  id="id_end_date"
+                  class="form-control"
+                />
+              </div>
+
+              <!-- Publication & Edition -->
+              <div class="col-md-6">
+                <label for="id_publication" class="form-label"
+                  >Publication</label
+                >
+                <select
+                  name="publication"
+                  id="id_publication"
+                  class="form-select"
+                >
+                  <option value="">All Publications</option>
+                  {% for pub in form.publication.field.queryset %}
+                  <option value="{{ pub.id }}">{{ pub.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="id_edition" class="form-label">Edition</label>
+                <select name="edition" id="id_edition" class="form-select">
+                  <option value="">All Editions</option>
+                  {% for edition in form.edition.field.queryset %}
+                  <option
+                    value="{{ edition.id }}"
+                    data-publication="{{ edition.publication.id }}"
+                  >
+                    {{ edition.name }} ({{ edition.publication.name }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Client & Campaign -->
+              <div class="col-md-6">
+                <label for="id_client" class="form-label">Client</label>
+                <select name="client" id="id_client" class="form-select">
+                  <option value="">All Clients</option>
+                  {% for client in form.client.field.queryset %}
+                  <option value="{{ client.id }}">{{ client.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="id_campaign" class="form-label">Campaign</label>
+                <select name="campaign" id="id_campaign" class="form-select">
+                  <option value="">All Campaigns</option>
+                  {% for campaign in form.campaign.field.queryset %}
+                  <option
+                    value="{{ campaign.id }}"
+                    data-client="{{ campaign.client.id }}"
+                  >
+                    {{ campaign.name }} ({{ campaign.client.name }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Coverage Type -->
+              <div class="col-md-6">
+                <label for="id_coverage_type" class="form-label"
+                  >Coverage Type</label
+                >
+                <select
+                  name="coverage_type"
+                  id="id_coverage_type"
+                  class="form-select"
+                >
+                  <option value="">All Types</option>
+                  <option value="Print">Print</option>
+                  <option value="Online">Online</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-file-export me-2"></i>Generate Report
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Template Info -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Template Information
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label text-muted">Template Name</label>
+            <p class="mb-0 fw-bold">{{ template.name }}</p>
+          </div>
+
+          {% if template.description %}
+          <div class="mb-3">
+            <label class="form-label text-muted">Description</label>
+            <p class="mb-0">{{ template.description }}</p>
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label text-muted">Field Mappings</label>
+            <p class="mb-0">
+              <span class="badge bg-success"
+                >{{ template.field_mappings|length }} fields mapped</span
+              >
+            </p>
+          </div>
+
+          <div>
+            <label class="form-label text-muted">Template File</label>
+            <p class="mb-0">{{ template.template_file.name|split:"/"|last }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Tips</h5>
+        </div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li class="mb-2">
+              <strong>Leave filters empty</strong> to include all data
+            </li>
+            <li class="mb-2">
+              <strong>Set a date range</strong> for time-specific reports
+            </li>
+            <li class="mb-2">
+              <strong>Filter by publication or edition</strong> for
+              publication-specific reports
+            </li>
+            <li class="mb-2">
+              <strong>Filter by client or campaign</strong> for client-specific
+              reports
+            </li>
+            <li>
+              <strong>Choose a coverage type</strong> to focus on print or
+              online coverage
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Publication and Edition linking
+    const publicationSelect = document.getElementById("id_publication");
+    const editionSelect = document.getElementById("id_edition");
+
+    if (publicationSelect && editionSelect) {
+      publicationSelect.addEventListener("change", function () {
+        const publicationId = this.value;
+
+        // Show/hide editions based on selected publication
+        Array.from(editionSelect.options).forEach((option) => {
+          if (option.value === "") {
+            // Always show "All Editions" option
+            return;
+          }
+
+          const editionPublicationId = option.getAttribute("data-publication");
+          if (!publicationId || editionPublicationId === publicationId) {
+            option.style.display = "";
+          } else {
+            option.style.display = "none";
+          }
+        });
+
+        // Reset edition selection if current selection is now hidden
+        const selectedOption =
+          editionSelect.options[editionSelect.selectedIndex];
+        if (
+          selectedOption.value !== "" &&
+          selectedOption.style.display === "none"
+        ) {
+          editionSelect.value = "";
+        }
+      });
+    }
+
+    // Client and Campaign linking
+    const clientSelect = document.getElementById("id_client");
+    const campaignSelect = document.getElementById("id_campaign");
+
+    if (clientSelect && campaignSelect) {
+      clientSelect.addEventListener("change", function () {
+        const clientId = this.value;
+
+        // Show/hide campaigns based on selected client
+        Array.from(campaignSelect.options).forEach((option) => {
+          if (option.value === "") {
+            // Always show "All Campaigns" option
+            return;
+          }
+
+          const campaignClientId = option.getAttribute("data-client");
+          if (!clientId || campaignClientId === clientId) {
+            option.style.display = "";
+          } else {
+            option.style.display = "none";
+          }
+        });
+
+        // Reset campaign selection if current selection is now hidden
+        const selectedOption =
+          campaignSelect.options[campaignSelect.selectedIndex];
+        if (
+          selectedOption.value !== "" &&
+          selectedOption.style.display === "none"
+        ) {
+          campaignSelect.value = "";
+        }
+      });
+    }
+  });
+</script>
+{% endblock %} {% endblock %}

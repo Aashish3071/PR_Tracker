@@ -1,0 +1,217 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Mapping Form -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-exchange-alt me-2"></i>Map Template Fields: "{{ template.name }}"
+          </h5>
+          <div>
+            <a href="{% url 'report_template_list' %}" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          {% if excel_columns %}
+          <form method="post">
+            {% csrf_token %}
+            
+            <p class="mb-4">
+              For each column in your Excel template, select the corresponding database field:
+            </p>
+            
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 40%">Excel Column</th>
+                    <th style="width: 60%">Database Field</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for column in excel_columns %}
+                  <tr>
+                    <td>
+                      <strong>{{ column }}</strong>
+                    </td>
+                    <td>
+                      <select name="mapping_{{ column }}" class="form-select">
+                        <option value="">-- Not Mapped --</option>
+                        
+                        <optgroup label="Coverage Fields">
+                          {% for field in available_fields.coverage %}
+                          <option value="{{ field }}" {% if field_mappings.column == field %}selected{% endif %}>
+                            {{ field|title|replace:"__":" > " }}
+                          </option>
+                          {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Publication Fields">
+                          {% for field in available_fields.publication %}
+                          <option value="publication.{{ field }}" {% if field_mappings.column == field %}selected{% endif %}>
+                            Publication > {{ field|title }}
+                          </option>
+                          {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Edition Fields">
+                          {% for field in available_fields.edition %}
+                          <option value="edition.{{ field }}" {% if field_mappings.column == field %}selected{% endif %}>
+                            Edition > {{ field|title }}
+                          </option>
+                          {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Client Fields">
+                          {% for field in available_fields.client %}
+                          <option value="client.{{ field }}" {% if field_mappings.column == field %}selected{% endif %}>
+                            Client > {{ field|title }}
+                          </option>
+                          {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Campaign Fields">
+                          {% for field in available_fields.campaign %}
+                          <option value="campaign.{{ field }}" {% if field_mappings.column == field %}selected{% endif %}>
+                            Campaign > {{ field|title }}
+                          </option>
+                          {% endfor %}
+                        </optgroup>
+                      </select>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Field Mappings
+              </button>
+            </div>
+          </form>
+          {% else %}
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> Could not read column headers from the Excel template.
+            <p class="mb-0 mt-2">
+              Please ensure your template has column headers in the first row and is a valid Excel file.
+            </p>
+          </div>
+          <div class="d-grid gap-2">
+            <a href="{% url 'upload_report_template' %}" class="btn btn-primary">
+              <i class="fas fa-upload me-2"></i>Upload New Template
+            </a>
+            <a href="{% url 'report_template_list' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Template Info -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Template Information
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label text-muted">Template Name</label>
+            <p class="mb-0 fw-bold">{{ template.name }}</p>
+          </div>
+          
+          {% if template.description %}
+          <div class="mb-3">
+            <label class="form-label text-muted">Description</label>
+            <p class="mb-0">{{ template.description }}</p>
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <label class="form-label text-muted">Uploaded On</label>
+            <p class="mb-0">{{ template.created_at|date:"d M Y, h:i A" }}</p>
+          </div>
+          
+          <div>
+            <label class="form-label text-muted">Template File</label>
+            <p class="mb-0">{{ template.template_file.name|split:"/"|last }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-question-circle me-2"></i>Help
+          </h5>
+        </div>
+        <div class="card-body">
+          <h6>Field Mapping Tips</h6>
+          <ul class="mb-3">
+            <li>Map each Excel column to a corresponding database field</li>
+            <li>You don't need to map every column</li>
+            <li>Fields with ">" indicate related data (e.g., "Publication > Name")</li>
+          </ul>
+          
+          <h6>Common Mappings</h6>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Excel Column</th>
+                  <th>Database Field</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Date</td>
+                  <td>date</td>
+                </tr>
+                <tr>
+                  <td>Publication</td>
+                  <td>publication__name</td>
+                </tr>
+                <tr>
+                  <td>Headline</td>
+                  <td>headline</td>
+                </tr>
+                <tr>
+                  <td>AVE</td>
+                  <td>ave</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Custom filter to replace underscores with spaces
+  document.addEventListener('DOMContentLoaded', function() {
+    const selects = document.querySelectorAll('select[name^="mapping_"]');
+    selects.forEach(select => {
+      Array.from(select.options).forEach(option => {
+        if (option.value) {
+          option.textContent = option.textContent.replace(/__/g, ' > ');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %} 

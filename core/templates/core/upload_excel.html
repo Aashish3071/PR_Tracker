@@ -1,0 +1,250 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <!-- Page Content -->
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Upload Form -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-file-excel me-2"></i>Upload Excel File
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+
+            <div class="mb-4">
+              <div class="file-upload-wrapper">
+                <div
+                  class="file-upload-message text-center p-5 border border-dashed rounded-3 mb-3"
+                >
+                  <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                  <h5>Drag and drop your Excel file here</h5>
+                  <p class="text-muted">or click to browse files</p>
+                  <input
+                    type="file"
+                    name="excel_file"
+                    id="excel_file"
+                    class="file-upload-input"
+                    accept=".xls,.xlsx"
+                    required
+                  />
+                </div>
+                <div id="file-details" class="d-none">
+                  <div class="alert alert-info d-flex align-items-center">
+                    <i class="fas fa-file-excel me-3 fa-2x"></i>
+                    <div>
+                      <h6 class="mb-0" id="file-name">filename.xlsx</h6>
+                      <small id="file-size">0 KB</small>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn-close ms-auto"
+                      id="remove-file"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i>Upload and Process
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Instructions -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Instructions
+          </h5>
+        </div>
+        <div class="card-body">
+          <p>Please ensure your Excel file has the following columns:</p>
+          <ul class="list-group mb-3">
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-primary me-2">Required</span>
+              <strong>Date</strong> - Coverage date (YYYY-MM-DD)
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-primary me-2">Required</span>
+              <strong>Publication</strong> - Publication name
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-primary me-2">Required</span>
+              <strong>Edition</strong> - Edition name
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-primary me-2">Required</span>
+              <strong>Headline</strong> - Article headline
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-primary me-2">Required</span>
+              <strong>Type</strong> - Print or Online
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-primary me-2">Required</span>
+              <strong>Size</strong> - Size in square centimeters
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-secondary me-2">Optional</span>
+              <strong>Page</strong> - Page number
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-secondary me-2">Optional</span>
+              <strong>Position</strong> - Position on page
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-secondary me-2">Optional</span>
+              <strong>Client</strong> - Client name
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <span class="badge bg-secondary me-2">Optional</span>
+              <strong>Campaign</strong> - Campaign name
+            </li>
+          </ul>
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Note:</strong> The first row of your Excel file should
+            contain the column headers.
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Template -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-download me-2"></i>Sample Template
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <p>Download a sample Excel template to get started:</p>
+          <a href="#" class="btn btn-outline-success">
+            <i class="fas fa-file-excel me-2"></i>Download Template
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .file-upload-wrapper {
+    position: relative;
+  }
+
+  .file-upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .file-upload-message {
+    transition: all 0.2s ease;
+  }
+
+  .file-upload-message:hover {
+    background-color: #f8f9fa;
+  }
+
+  .border-dashed {
+    border-style: dashed !important;
+    border-width: 2px !important;
+    border-color: #dee2e6 !important;
+  }
+</style>
+
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("excel_file");
+    const fileDetails = document.getElementById("file-details");
+    const fileName = document.getElementById("file-name");
+    const fileSize = document.getElementById("file-size");
+    const removeFile = document.getElementById("remove-file");
+    const uploadMessage = document.querySelector(".file-upload-message");
+
+    fileInput.addEventListener("change", function () {
+      if (this.files.length > 0) {
+        const file = this.files[0];
+        fileName.textContent = file.name;
+
+        // Format file size
+        let size = file.size;
+        let sizeStr = "";
+
+        if (size < 1024) {
+          sizeStr = size + " bytes";
+        } else if (size < 1024 * 1024) {
+          sizeStr = (size / 1024).toFixed(2) + " KB";
+        } else {
+          sizeStr = (size / (1024 * 1024)).toFixed(2) + " MB";
+        }
+
+        fileSize.textContent = sizeStr;
+        fileDetails.classList.remove("d-none");
+        uploadMessage.classList.add("d-none");
+      }
+    });
+
+    removeFile.addEventListener("click", function () {
+      fileInput.value = "";
+      fileDetails.classList.add("d-none");
+      uploadMessage.classList.remove("d-none");
+    });
+
+    // Drag and drop functionality
+    const dropArea = document.querySelector(".file-upload-message");
+
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+      dropArea.classList.add("bg-light");
+    }
+
+    function unhighlight() {
+      dropArea.classList.remove("bg-light");
+    }
+
+    dropArea.addEventListener("drop", handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+
+      if (files.length > 0) {
+        fileInput.files = files;
+        const event = new Event("change");
+        fileInput.dispatchEvent(event);
+      }
+    }
+  });
+</script>
+{% endblock %}

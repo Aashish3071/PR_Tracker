@@ -1,0 +1,83 @@
+{% extends 'base.html' %} {% block content %}
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="welcome-section mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="display-5 fw-bold">Delete Template</h1>
+        <p class="lead text-muted">
+          Confirm deletion of "{{ template.name }}" template
+        </p>
+      </div>
+      <div class="col-md-4 text-end">
+        <a
+          href="{% url 'report_template_list' %}"
+          class="btn btn-outline-primary"
+        >
+          <i class="fas fa-arrow-left me-2"></i>Back to Templates
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <!-- Confirmation Card -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">
+            <i class="fas fa-exclamation-triangle text-danger me-2"></i>Confirm
+            Deletion
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <div class="icon-box bg-danger-subtle mx-auto mb-3">
+              <i class="fas fa-trash text-danger"></i>
+            </div>
+            <h3>Are you sure?</h3>
+            <p class="text-muted">
+              You are about to delete the template "<strong
+                >{{ template.name }}</strong
+              >". This action cannot be undone.
+            </p>
+          </div>
+
+          <div class="alert alert-warning">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Note:</strong> Deleting this template will also remove any
+            field mappings associated with it.
+          </div>
+
+          <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="d-grid gap-3">
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Yes, Delete Template
+              </button>
+              <a
+                href="{% url 'report_template_list' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-times me-2"></i>No, Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .icon-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+</style>
+{% endblock %}
