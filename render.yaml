@@ -3,7 +3,7 @@ services:
     name: pr-tracker
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: gunicorn ave_calculator.wsgi:application
+    startCommand: gunicorn --pythonpath . ave_calculator.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -17,6 +17,8 @@ services:
         fromDatabase:
           name: pr-tracker-db
           property: connectionString
+      - key: RENDER
+        value: true
 
 databases:
   - name: pr-tracker-db

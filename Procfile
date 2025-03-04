@@ -1,1 +1,1 @@
-web: gunicorn ave_calculator.wsgi:application 
+web: gunicorn --pythonpath . ave_calculator.wsgi:application 
