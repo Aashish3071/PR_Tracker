@@ -1,0 +1,274 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Report Template
+Guide - PR Tracker{% endblock %} {% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-file-excel mr-2"></i>Report Template Guide
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i> This guide explains how to
+            use custom templates to automatically generate client reports.
+          </div>
+
+          <h5 class="mt-4 mb-3">Overview</h5>
+          <p>
+            The PR Tracker's automated report generation system allows you to
+            upload your own Excel templates (like Sony's) and have the system
+            automatically fill them with data from your coverage entries. This
+            saves hours of manual work and ensures consistency across all your
+            client reporting.
+          </p>
+
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h5 class="mb-0">Step 1: Upload Your Template</h5>
+                </div>
+                <div class="card-body">
+                  <p>
+                    Upload your client-specific Excel template with placeholders
+                    for data.
+                  </p>
+                  <ol>
+                    <li>
+                      Navigate to <strong>Report Templates</strong> in the main
+                      navigation
+                    </li>
+                    <li>Click <strong>Add New Template</strong></li>
+                    <li>Upload your Excel file</li>
+                    <li>Name your template (e.g., "Sony Template")</li>
+                  </ol>
+                  <div class="text-center mt-3">
+                    <img
+                      src="{% static 'core/images/guide/upload_template.png' %}"
+                      alt="Upload Template"
+                      class="img-fluid rounded border"
+                      style="max-height: 200px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h5 class="mb-0">Step 2: Configure Mapping</h5>
+                </div>
+                <div class="card-body">
+                  <p>
+                    Map the placeholders in your template to data fields in PR
+                    Tracker.
+                  </p>
+                  <ol>
+                    <li>After uploading, you'll see the mapping interface</li>
+                    <li>
+                      Match each placeholder with the corresponding data field
+                    </li>
+                    <li>
+                      For example, map <code>{{CLIENT_NAME}}</code> to the
+                      client record
+                    </li>
+                    <li>Save your mapping configuration</li>
+                  </ol>
+                  <div class="text-center mt-3">
+                    <img
+                      src="{% static 'core/images/guide/mapping.png' %}"
+                      alt="Configure Mapping"
+                      class="img-fluid rounded border"
+                      style="max-height: 200px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h5 class="mb-0">Step 3: Generate Report</h5>
+                </div>
+                <div class="card-body">
+                  <p>Generate your report with a single click.</p>
+                  <ol>
+                    <li>
+                      Go to <strong>Generate Reports</strong> in the navigation
+                    </li>
+                    <li>Select your template from the dropdown</li>
+                    <li>Set the date range for the report period</li>
+                    <li>Click <strong>Generate Report</strong></li>
+                  </ol>
+                  <div class="text-center mt-3">
+                    <img
+                      src="{% static 'core/images/guide/generate_report.png' %}"
+                      alt="Generate Report"
+                      class="img-fluid rounded border"
+                      style="max-height: 200px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h5 class="mb-0">Step 4: Download & Share</h5>
+                </div>
+                <div class="card-body">
+                  <p>Review, download, and share your completed report.</p>
+                  <ol>
+                    <li>Preview the generated report</li>
+                    <li>Make any final adjustments if needed</li>
+                    <li>Click <strong>Download Report</strong></li>
+                    <li>Share the Excel file with your client</li>
+                  </ol>
+                  <div class="text-center mt-3">
+                    <img
+                      src="{% static 'core/images/guide/download_report.png' %}"
+                      alt="Download Report"
+                      class="img-fluid rounded border"
+                      style="max-height: 200px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="mt-4 mb-3">Template Requirements</h5>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="thead-light">
+                <tr>
+                  <th>Placeholder Type</th>
+                  <th>Example</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Text Placeholders</td>
+                  <td><code>{{CLIENT_NAME}}</code></td>
+                  <td>
+                    Simple text replacements for client names, dates, etc.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Table Placeholders</td>
+                  <td><code>{{COVERAGE_TABLE}}</code></td>
+                  <td>Entire tables of data, like coverage listings</td>
+                </tr>
+                <tr>
+                  <td>Numeric Placeholders</td>
+                  <td><code>{{TOTAL_AVE}}</code></td>
+                  <td>
+                    Numbers and calculations like total AVE, impressions, etc.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date Placeholders</td>
+                  <td><code>{{REPORT_DATE}}</code></td>
+                  <td>
+                    Date values that will be formatted according to your
+                    template
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h5 class="mt-4 mb-3">Tips for Success</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h6>
+                    <i class="fas fa-check-circle text-success mr-2"></i>Use
+                    Consistent Placeholders
+                  </h6>
+                  <p class="mb-0">
+                    Use the same format for all placeholders, like
+                    <code>{{PLACEHOLDER_NAME}}</code>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h6>
+                    <i class="fas fa-check-circle text-success mr-2"></i
+                    >Preserve Formulas
+                  </h6>
+                  <p class="mb-0">
+                    Your Excel formulas will remain intact, only data cells will
+                    be updated
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h6>
+                    <i class="fas fa-check-circle text-success mr-2"></i>Test
+                    with Small Date Ranges
+                  </h6>
+                  <p class="mb-0">
+                    Run a test report with a small date range to verify
+                    everything maps correctly
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h6>
+                    <i class="fas fa-check-circle text-success mr-2"></i>Keep
+                    Formatting
+                  </h6>
+                  <p class="mb-0">
+                    All your template's formatting, charts, and styling will be
+                    preserved
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">
+              <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+            <a href="#" class="btn btn-success ml-2" id="start-template-guide">
+              <i class="fas fa-play-circle mr-2"></i>Start Interactive Guide
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Start interactive guide when button is clicked
+    document
+      .getElementById("start-template-guide")
+      .addEventListener("click", function (e) {
+        e.preventDefault();
+        if (window.prTrackerGuide) {
+          window.prTrackerGuide.showReportTemplateGuide();
+        }
+      });
+  });
+</script>
+{% endblock %}

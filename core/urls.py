@@ -23,6 +23,7 @@ urlpatterns = [
     path('report-templates/delete/<int:template_id>/', views.delete_report_template, name='delete_report_template'),
     path('report-templates/generate/<int:template_id>/', views.generate_report, name='generate_report'),
     path('report-templates/download/<int:report_id>/', views.download_generated_report, name='download_generated_report'),
+    path('report-templates/guide/', views.report_template_guide, name='report_template_guide'),
     
     # AJAX endpoints
     path('get-editions/', views.get_editions, name='get_editions'),

@@ -1139,3 +1139,9 @@ def edit_profile(request):
     
     return render(request, 'registration/edit_profile.html', {'form': form})
 
+def report_template_guide(request):
+    """
+    View for displaying the report template guide page.
+    """
+    return render(request, 'core/report_template_guide.html')
+
