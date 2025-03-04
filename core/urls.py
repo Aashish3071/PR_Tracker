@@ -41,4 +41,7 @@ urlpatterns = [
     path('accounts/register/', views.register, name='register'),
     path('accounts/profile/', views.profile, name='profile'),
     path('accounts/profile/edit/', views.edit_profile, name='edit_profile'),
+    
+    # Debug URL - remove in production
+    path('debug/', views.debug_view, name='debug'),
 ]

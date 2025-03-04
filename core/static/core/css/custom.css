@@ -1,0 +1,9 @@
+/* Custom CSS to fix UI issues */
+
+/* Hide the "Most Popular" button */
+.most-popular-button,
+button.most-popular {
+  display: none !important;
+}
+
+/* Additional fixes for Render-specific UI elements if needed */

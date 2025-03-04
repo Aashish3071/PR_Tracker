@@ -1,0 +1,64 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2>Debug Information</h2>
+    </div>
+    <div class="card-body">
+      <h3>System Information</h3>
+      <ul class="list-group mb-4">
+        <li class="list-group-item">
+          <strong>Python Version:</strong> {{ debug_info.python_version }}
+        </li>
+        <li class="list-group-item">
+          <strong>Django Version:</strong> {{ debug_info.django_version }}
+        </li>
+        <li class="list-group-item">
+          <strong>Debug Mode:</strong> {{ debug_info.debug_mode }}
+        </li>
+      </ul>
+
+      <h3>Database Configuration</h3>
+      <ul class="list-group mb-4">
+        <li class="list-group-item">
+          <strong>Database Engine:</strong> {{ debug_info.database_engine }}
+        </li>
+      </ul>
+
+      <h3>Path Information</h3>
+      <ul class="list-group mb-4">
+        <li class="list-group-item">
+          <strong>Static Root:</strong> {{ debug_info.static_root }}
+        </li>
+        <li class="list-group-item">
+          <strong>Media Root:</strong> {{ debug_info.media_root }}
+        </li>
+        <li class="list-group-item">
+          <strong>Base Directory:</strong> {{ debug_info.base_dir }}
+        </li>
+      </ul>
+
+      <h3>Installed Apps</h3>
+      <ul class="list-group mb-4">
+        {% for app in debug_info.installed_apps %}
+        <li class="list-group-item">{{ app }}</li>
+        {% endfor %}
+      </ul>
+
+      <h3>Middleware</h3>
+      <ul class="list-group mb-4">
+        {% for middleware in debug_info.middleware %}
+        <li class="list-group-item">{{ middleware }}</li>
+        {% endfor %}
+      </ul>
+
+      <h3>Environment Variables</h3>
+      <ul class="list-group mb-4">
+        {% for key, value in debug_info.environment.items %}
+        <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

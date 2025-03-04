@@ -155,7 +155,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
-# For production, use a proper email backend:
+
+# For production on Render
+if os.environ.get('RENDER', False):
+    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'  # Prevents email errors in production without proper SMTP setup
+    
+# Uncomment and configure for production email
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.example.com'
 # EMAIL_PORT = 587

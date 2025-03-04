@@ -19,6 +19,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+import django
 
 def landing_page(request):
     """
@@ -1151,4 +1152,26 @@ def report_template_guide(request):
     View for displaying the report template guide page.
     """
     return render(request, 'core/report_template_guide.html')
+
+# Debug view to help diagnose issues
+def debug_view(request):
+    """A view to help diagnose server issues."""
+    from django.conf import settings
+    import sys
+    import os
+    
+    debug_info = {
+        'python_version': sys.version,
+        'django_version': django.__version__,
+        'debug_mode': settings.DEBUG,
+        'database_engine': settings.DATABASES['default']['ENGINE'],
+        'installed_apps': settings.INSTALLED_APPS,
+        'middleware': settings.MIDDLEWARE,
+        'static_root': settings.STATIC_ROOT,
+        'media_root': settings.MEDIA_ROOT,
+        'base_dir': settings.BASE_DIR,
+        'environment': {k: v for k, v in os.environ.items() if not k.startswith('_') and k.isupper()},
+    }
+    
+    return render(request, 'debug.html', {'debug_info': debug_info})
 
