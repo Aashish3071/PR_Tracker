@@ -20,7 +20,7 @@ from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-@login_required(login_url='/admin/login/')
+@login_required
 def home(request):
     # Get statistics for dashboard
     total_coverages = Coverage.objects.count()
