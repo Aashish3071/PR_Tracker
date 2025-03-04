@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -33,4 +33,10 @@ urlpatterns = [
     path('editions/add/', views.add_edition, name='add_edition'),
     path('clients/add/', views.add_client, name='add_client'),
     path('campaigns/add/', views.add_campaign, name='add_campaign'),
+    
+    # Authentication URLs
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register/', views.register, name='register'),
+    path('accounts/profile/', views.profile, name='profile'),
+    path('accounts/profile/edit/', views.edit_profile, name='edit_profile'),
 ]

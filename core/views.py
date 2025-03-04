@@ -17,6 +17,8 @@ from django.db.models import Q
 import os
 from django.conf import settings
 from django.urls import reverse
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 @login_required(login_url='/admin/login/')
 def home(request):
@@ -1073,4 +1075,67 @@ def add_campaign(request):
         'clients': clients,
         'selected_client': selected_client
     })
+
+# User Authentication Views
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.email = request.POST.get('email')
+            user.first_name = request.POST.get('first_name', '')
+            user.last_name = request.POST.get('last_name', '')
+            user.save()
+            messages.success(request, 'Account created successfully. You can now log in.')
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'registration/register.html', {'form': form})
+
+@login_required
+def profile(request):
+    # Get user activity statistics
+    coverages_count = Coverage.objects.filter(user=request.user).count()
+    clients_count = Client.objects.filter(coverages__user=request.user).distinct().count()
+    campaigns_count = Campaign.objects.filter(coverages__user=request.user).distinct().count()
+    
+    # Get recent coverages
+    recent_coverages = Coverage.objects.filter(user=request.user).order_by('-date')[:5]
+    
+    context = {
+        'coverages_count': coverages_count,
+        'clients_count': clients_count,
+        'campaigns_count': campaigns_count,
+        'recent_coverages': recent_coverages,
+    }
+    
+    return render(request, 'registration/profile.html', context)
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        # Get current user
+        user = request.user
+        
+        # Update user information
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        
+        # Save changes
+        user.save()
+        
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('profile')
+    
+    # Pre-populate form with current user data
+    form = {
+        'username': request.user.username,
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'email': request.user.email,
+    }
+    
+    return render(request, 'registration/edit_profile.html', {'form': form})
 

@@ -1,0 +1,103 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h4 class="mb-0 text-center">
+            <i class="fas fa-sign-in-alt me-2"></i>Log In
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Your username and password didn't match. Please try again.
+          </div>
+          {% endif %} {% if next %} {% if user.is_authenticated %}
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Your account doesn't have access to this page. To proceed, please
+            login with an account that has access.
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Please login to see this page.
+          </div>
+          {% endif %} {% endif %}
+
+          <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="id_username" class="form-label">Username</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-user"></i
+                ></span>
+                <input
+                  type="text"
+                  name="username"
+                  id="id_username"
+                  class="form-control"
+                  placeholder="Enter your username"
+                  required
+                  autofocus
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-lock"></i
+                ></span>
+                <input
+                  type="password"
+                  name="password"
+                  id="id_password"
+                  class="form-control"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="remember-me"
+              />
+              <label class="form-check-label" for="remember-me"
+                >Remember me</label
+              >
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>Log In
+              </button>
+              <a
+                href="{% url 'password_reset' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-key me-2"></i>Forgot Password?
+              </a>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}" />
+          </form>
+        </div>
+        <div class="card-footer bg-white text-center py-3">
+          <p class="mb-0">
+            Don't have an account? <a href="{% url 'register' %}">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

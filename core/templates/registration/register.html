@@ -1,0 +1,153 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h4 class="mb-0 text-center">
+            <i class="fas fa-user-plus me-2"></i>Create an Account
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Please correct the errors below.
+          </div>
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="id_username" class="form-label">Username</label>
+              <div
+                class="input-group {% if form.username.errors %}has-error{% endif %}"
+              >
+                <span class="input-group-text"
+                  ><i class="fas fa-user"></i
+                ></span>
+                <input
+                  type="text"
+                  name="username"
+                  id="id_username"
+                  class="form-control"
+                  placeholder="Choose a username"
+                  required
+                  autofocus
+                />
+              </div>
+              {% if form.username.errors %}
+              <div class="text-danger small mt-1">
+                {{ form.username.errors }}
+              </div>
+              {% endif %}
+              <div class="form-text">
+                Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+                only.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_email" class="form-label">Email Address</label>
+              <div
+                class="input-group {% if form.email.errors %}has-error{% endif %}"
+              >
+                <span class="input-group-text"
+                  ><i class="fas fa-envelope"></i
+                ></span>
+                <input
+                  type="email"
+                  name="email"
+                  id="id_email"
+                  class="form-control"
+                  placeholder="Enter your email address"
+                  required
+                />
+              </div>
+              {% if form.email.errors %}
+              <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="id_password1" class="form-label">Password</label>
+              <div
+                class="input-group {% if form.password1.errors %}has-error{% endif %}"
+              >
+                <span class="input-group-text"
+                  ><i class="fas fa-lock"></i
+                ></span>
+                <input
+                  type="password"
+                  name="password1"
+                  id="id_password1"
+                  class="form-control"
+                  placeholder="Create a password"
+                  required
+                />
+              </div>
+              {% if form.password1.errors %}
+              <div class="text-danger small mt-1">
+                {{ form.password1.errors }}
+              </div>
+              {% endif %}
+              <div class="form-text">
+                <ul class="mb-0 ps-3">
+                  <li>
+                    Your password can't be too similar to your other personal
+                    information.
+                  </li>
+                  <li>Your password must contain at least 8 characters.</li>
+                  <li>Your password can't be a commonly used password.</li>
+                  <li>Your password can't be entirely numeric.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="id_password2" class="form-label"
+                >Confirm Password</label
+              >
+              <div
+                class="input-group {% if form.password2.errors %}has-error{% endif %}"
+              >
+                <span class="input-group-text"
+                  ><i class="fas fa-lock"></i
+                ></span>
+                <input
+                  type="password"
+                  name="password2"
+                  id="id_password2"
+                  class="form-control"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+              {% if form.password2.errors %}
+              <div class="text-danger small mt-1">
+                {{ form.password2.errors }}
+              </div>
+              {% endif %}
+              <div class="form-text">
+                Enter the same password as before, for verification.
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-user-plus me-2"></i>Register
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card-footer bg-white text-center py-3">
+          <p class="mb-0">
+            Already have an account? <a href="{% url 'login' %}">Log in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
