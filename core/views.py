@@ -20,6 +20,13 @@ from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+def landing_page(request):
+    """
+    Landing page view that doesn't require authentication.
+    This serves as the entry point for users before they log in.
+    """
+    return render(request, 'core/landing_page.html')
+
 @login_required
 def home(request):
     # Get statistics for dashboard
@@ -62,7 +69,7 @@ def home(request):
     
     return render(request, 'core/dashboard.html', context)
 
-@login_required(login_url='/admin/login/')
+@login_required
 def add_coverage(request):
     if request.method == 'POST':
         form = CoverageForm(request.POST)
@@ -139,7 +146,7 @@ def add_coverage(request):
     
     return render(request, 'core/add_coverage.html', {'form': form})
 
-@login_required(login_url='/admin/login/')
+@login_required
 def coverage_list(request):
     coverages = Coverage.objects.filter(user=request.user)
     print_count = coverages.filter(is_online=False).count()
@@ -150,7 +157,7 @@ def coverage_list(request):
         'online_count': online_count
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def upload_excel(request):
     if request.method == 'POST' and request.FILES.get('excel_file'):
         excel_file = request.FILES['excel_file']
@@ -292,7 +299,7 @@ def upload_excel(request):
 
     return render(request, 'core/upload_excel.html')
 
-@login_required(login_url='/admin/login/')
+@login_required
 def coverage_report(request):
     coverages = Coverage.objects.filter(user=request.user)
     if 'start_date' in request.GET:
@@ -474,12 +481,12 @@ def export_ave_report(request):
     
     return response
 
-@login_required(login_url='/admin/login/')
+@login_required
 def custom_formula_list(request):
     formulas = CustomFormula.objects.filter(user=request.user)
     return render(request, 'core/custom_formula_list.html', {'formulas': formulas})
 
-@login_required(login_url='/admin/login/')
+@login_required
 def add_custom_formula(request):
     if request.method == 'POST':
         form = CustomFormulaForm(request.POST)
@@ -500,7 +507,7 @@ def add_custom_formula(request):
         'available_variables': available_variables
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def edit_custom_formula(request, formula_id):
     formula = get_object_or_404(CustomFormula, id=formula_id, user=request.user)
     
@@ -522,7 +529,7 @@ def edit_custom_formula(request, formula_id):
         'available_variables': available_variables
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def delete_custom_formula(request, formula_id):
     formula = get_object_or_404(CustomFormula, id=formula_id, user=request.user)
     
@@ -533,7 +540,7 @@ def delete_custom_formula(request, formula_id):
     
     return render(request, 'core/delete_custom_formula.html', {'formula': formula})
 
-@login_required(login_url='/admin/login/')
+@login_required
 def test_custom_formula(request, formula_id):
     formula = get_object_or_404(CustomFormula, id=formula_id, user=request.user)
     
@@ -566,7 +573,7 @@ def test_custom_formula(request, formula_id):
         'available_variables': CustomFormula.AVAILABLE_VARIABLES
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def search(request):
     query = request.GET.get('q', '')
     publication_id = request.GET.get('publication', '')
@@ -688,14 +695,14 @@ def search(request):
     return render(request, 'core/search.html', context)
 
 # Report Template Views
-@login_required(login_url='/admin/login/')
+@login_required
 def report_template_list(request):
     templates = ReportTemplate.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'core/report_template_list.html', {
         'templates': templates
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def upload_report_template(request):
     if request.method == 'POST':
         form = ReportTemplateForm(request.POST, request.FILES)
@@ -714,7 +721,7 @@ def upload_report_template(request):
         'form': form
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def edit_report_template(request, template_id):
     template = get_object_or_404(ReportTemplate, id=template_id, user=request.user)
     
@@ -765,7 +772,7 @@ def edit_report_template(request, template_id):
         'field_mappings': template.field_mappings
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def delete_report_template(request, template_id):
     template = get_object_or_404(ReportTemplate, id=template_id, user=request.user)
     
@@ -778,7 +785,7 @@ def delete_report_template(request, template_id):
         'template': template
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def generate_report(request, template_id):
     template = get_object_or_404(ReportTemplate, id=template_id, user=request.user)
     
@@ -821,7 +828,7 @@ def generate_report(request, template_id):
         'form': form
     })
 
-@login_required(login_url='/admin/login/')
+@login_required
 def download_generated_report(request, report_id):
     report = get_object_or_404(GeneratedReport, id=report_id, user=request.user)
     
@@ -943,7 +950,7 @@ def process_report(report_id):
         report.save()
         raise e
 
-@login_required(login_url='/admin/login/')
+@login_required
 def get_editions(request):
     """AJAX view to get editions for a publication"""
     publication_id = request.GET.get('publication_id')
@@ -952,7 +959,7 @@ def get_editions(request):
         return JsonResponse({'editions': list(editions)})
     return JsonResponse({'editions': []})
 
-@login_required(login_url='/admin/login/')
+@login_required
 def get_campaigns(request):
     """AJAX view to get campaigns for a client"""
     client_id = request.GET.get('client_id')
@@ -961,7 +968,7 @@ def get_campaigns(request):
         return JsonResponse({'campaigns': list(campaigns)})
     return JsonResponse({'campaigns': []})
 
-@login_required(login_url='/admin/login/')
+@login_required
 def add_publication(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
@@ -981,7 +988,7 @@ def add_publication(request):
     # GET request - show form
     return render(request, 'core/add_publication.html')
 
-@login_required(login_url='/admin/login/')
+@login_required
 def add_edition(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
@@ -1012,7 +1019,7 @@ def add_edition(request):
     publications = Publication.objects.all().order_by('name')
     return render(request, 'core/add_edition.html', {'publications': publications})
 
-@login_required(login_url='/admin/login/')
+@login_required
 def add_client(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
@@ -1032,7 +1039,7 @@ def add_client(request):
     # GET request - show form
     return render(request, 'core/add_client.html')
 
-@login_required(login_url='/admin/login/')
+@login_required
 def add_campaign(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
