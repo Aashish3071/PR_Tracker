@@ -25,20 +25,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-u(p^9n_cl290&v5r370)vfcf6vx6$b$b*fp8gf^b5n9rli1&u$")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'RENDER' not in os.environ
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 
 # Security settings - completely disabled in development
-SECURE_PROXY_SSL_HEADER = None
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-SECURE_BROWSER_XSS_FILTER = False
-SECURE_CONTENT_TYPE_NOSNIFF = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = 'RENDER' in os.environ
+SESSION_COOKIE_SECURE = 'RENDER' in os.environ
+CSRF_COOKIE_SECURE = 'RENDER' in os.environ
+SECURE_HSTS_SECONDS = 0 if DEBUG else 2592000  # 30 days
+SECURE_HSTS_INCLUDE_SUBDOMAINS = 'RENDER' in os.environ
+SECURE_HSTS_PRELOAD = 'RENDER' in os.environ
+SECURE_BROWSER_XSS_FILTER = 'RENDER' in os.environ
+SECURE_CONTENT_TYPE_NOSNIFF = 'RENDER' in os.environ
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Application definition
@@ -90,26 +90,13 @@ WSGI_APPLICATION = "ave_calculator.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Use PostgreSQL in production and SQLite in development
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'ave_calculator_db',
-            'USER': 'postgres',
-            'PASSWORD': '3071',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
-else:
-    # Use Render PostgreSQL database
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600
-        )
-    }
+DATABASES = {
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 
 # Password validation
@@ -146,7 +133,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',

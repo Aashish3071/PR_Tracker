@@ -1,1 +1,1 @@
-web: gunicorn ave_calculator.wsgi:application --log-file - 
+web: gunicorn ave_calculator.wsgi:application 
